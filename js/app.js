@@ -208,24 +208,42 @@ $(function () {
   });
 
   // ---- User applies a label to messages
+  // ---- Users can create new labels
+  // ---- Users cannot create duplicate labels
   $('[data-behavior=apply-label]').on('change', function () {
-    var value = $(this).val();
-
-    $('[data-message-id].selected').each(function () {
-      var $el = $(this).find('[data-container=info]');
-      var labels = $el.find("[data-label]").map(function () {
-        return this.innerHTML;
-      }).get();
-      if (labels.indexOf(value) === -1) {
-        $el.find('[data-label]').remove();
-        labels.push(value);
-        labels.sort();
-        labels.reverse()
-        labels.forEach(function (label) {
-          $el.prepend('<span data-label class="label label-warning">' + label + '</span>');
-        });
+    var value;
+    if ($(this).find('option:selected').is('[data-behavior=new-label]')) {
+      value = prompt('Enter the name of the new label:');
+      value = value.trim().toLowerCase();
+      if (value !== '') {
+        var existingValues = $(this).find('option').map(function () {
+          return this.value;
+        }).get();
+        if (existingValues.indexOf(value) === -1) {
+          $(this).find('option:nth-child(1)').after('<option value="' + value + '">' + value + '</option>');
+          $('[data-behavior=remove-label]').find('option:nth-child(1)').after('<option value="' + value + '">' + value + '</option>');
+        }
       }
-    });
+    } else {
+      value = $(this).val();
+    }
+    if (value !== '') {
+      $('[data-message-id].selected').each(function () {
+        var $el = $(this).find('[data-container=info]');
+        var labels = $el.find("[data-label]").map(function () {
+          return this.innerHTML;
+        }).get();
+        if (labels.indexOf(value) === -1) {
+          $el.find('[data-label]').remove();
+          labels.push(value);
+          labels.sort();
+          labels.reverse()
+          labels.forEach(function (label) {
+            $el.prepend('<span data-label class="label label-warning">' + label + '</span>');
+          });
+        }
+      });
+    }
     this.selectedIndex = 0;
   });
 
