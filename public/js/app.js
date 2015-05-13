@@ -31,7 +31,11 @@ $(function () {
 
   $.getJSON('/api/messages').then(function (messages) {
     var selectedMessageCount = 0;
+    var allLabels = [];
     messages.forEach(function (message) {
+      message.labels.forEach(function (label) {
+        if(allLabels.indexOf(label) === -1) allLabels.push(label);
+      });
       var checked = sessionStorage.getItem('message-' + message._id);
       if (checked) selectedMessageCount++;
 
@@ -53,13 +57,21 @@ $(function () {
 
     var $multiselect = $('[data-behavior=multiselect]');
 
+    allLabels.sort().reverse();
+    allLabels.forEach(function (label) {
+      $('[data-behavior=apply-label] option:first')
+        .after('<option value="' + label + '">' + label + '</option>');
+      $('[data-behavior=remove-label] option:first')
+        .after('<option value="' + label + '">' + label + '</option>');
+    });
+
     if(selectedMessageCount === 0) {
       $multiselect.find('i')
         .removeClass('fa-check-square-o')
         .removeClass('fa-minus-square-o')
         .addClass('fa-square-o');
       $('[data-disableable]').prop('disabled', true);
-    } else if (selectedMessageCount === data.messages.length) {
+    } else if (selectedMessageCount === messages.length) {
       $multiselect.find('i')
         .removeClass('fa-square-o')
         .removeClass('fa-minus-square-o')
@@ -235,12 +247,23 @@ $(function () {
       value = prompt('Enter the name of the new label:');
       value = value.trim().toLowerCase();
       if (value !== '') {
-        var existingValues = $(this).find('option').map(function () {
-          return this.value;
-        }).get();
+        var $options = $(this).find('option[value!=""]');
+        var existingValues = $options.map(function () { return this.value; }).get();
         if (existingValues.indexOf(value) === -1) {
-          $(this).find('option:nth-child(1)').after('<option value="' + value + '">' + value + '</option>');
-          $('[data-behavior=remove-label]').find('option:nth-child(1)').after('<option value="' + value + '">' + value + '</option>');
+          $options.remove();
+          $('[data-behavior=remove-label] option[value!=""]').remove();
+
+          existingValues.push(value);
+          existingValues.sort();
+          existingValues.reverse()
+          existingValues.forEach(function (label) {
+            $('[data-behavior=apply-label]')
+              .find('option:nth-child(1)')
+              .after('<option value="' + label + '">' + label + '</option>');
+            $('[data-behavior=remove-label]')
+              .find('option:nth-child(1)')
+              .after('<option value="' + label + '">' + label + '</option>');
+          });
         }
       }
     } else {
