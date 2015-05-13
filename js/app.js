@@ -1,3 +1,22 @@
+/*
+
+The following is an example of the DOM-as-data approach to
+jQuery.  With the exception of the initial data loading,
+there are no separate data structures (no models).
+
+The code below demonstrates very primitive templating,
+without requiring Mustache or Handlebars or any other
+templating engine.
+
+No attempt has been made to DRY up the code, or otherwise
+make the code easy to maintain.  It is intentionally written
+in a very procedural style that should be relatively easy to
+follow.  You will see long, complex functions, duplication,
+tight-coupling of components and other violations of
+commonly agreed-upon best practices for modern JavaScript code.
+
+*/
+
 $(function () {
 
   // ---- INITIAL PAGE LOAD
