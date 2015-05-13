@@ -39,7 +39,7 @@
               <i class="fa fa-square-o"></i>
             </button>
 
-            <button class="btn btn-default" disabled data-disableable>
+            <button class="btn btn-default" data-behavior="mark-as-read" disabled data-disableable>
               Mark As Read
             </button>
 
@@ -65,11 +65,7 @@
               <i class="fa fa-trash-o"></i>
             </button>
           </div>
-          <div class="col-md-2">
-            <p class="text-right">
-              <span class="badge badge">2</span>
-              unread messages
-            </p>
+          <div class="col-md-2" data-container="unread-message-count">
           </div>
         </div>
       </div>
@@ -93,6 +89,13 @@
           {subject}
         </div>
       </div>
+    </script>
+
+    <script type="text/html" data-template="unread-message-count">
+      <p class="text-right">
+        <span class="badge badge">{messageCount}</span>
+        {description}
+      </p>
     </script>
 
     <script src="bower_components/jquery/dist/jquery.min.js"></script>

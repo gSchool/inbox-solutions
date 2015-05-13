@@ -2,13 +2,21 @@ $(function () {
 
   // ---- INITIAL PAGE LOAD
   // ---- Loads selection state from sessionStorage
-  var templateString = $('[data-template=message]').text();
+  var TEMPLATES = {
+    unreadMessageCount: $('[data-template=unread-message-count]').text(),
+    message: $('[data-template=message]').text()
+  };
+
   var $messagesContainer = $("[data-container=messages]");
+  var $unreadMessageCountContainer = $("[data-container=unread-message-count]");
+
   $.getJSON('/api/inbox.json').then(function (data) {
+    var selectedMessageCount = 0;
     data.messages.forEach(function (message) {
       var checked = sessionStorage.getItem('message-' + message.id);
+      if (checked) selectedMessageCount++;
       $messagesContainer.append(
-        templateString
+        TEMPLATES.message
           .replace('{readClass}', message.read ? 'read' : 'unread')
           .replace('{checked}', checked ? 'checked' : '')
           .replace('{starClass}', message.starred ? 'fa-star' : 'fa-star-o')
@@ -17,6 +25,36 @@ $(function () {
           .replace('{messageId}', message.id)
       )
     });
+
+    var $multiselect = $('[data-behavior=multiselect]');
+
+    if(selectedMessageCount === 0) {
+      $multiselect.find('i')
+        .removeClass('fa-check-square-o')
+        .removeClass('fa-minus-square-o')
+        .addClass('fa-square-o');
+      $('[data-disableable]').prop('disabled', true);
+    } else if (selectedMessageCount === data.messages.length) {
+      $multiselect.find('i')
+        .removeClass('fa-square-o')
+        .removeClass('fa-minus-square-o')
+        .addClass('fa-check-square-o');
+      $('[data-disableable]').prop('disabled', false);
+    } else {
+      $multiselect.find('i')
+        .removeClass('fa-square-o')
+        .removeClass('fa-check-square-o')
+        .addClass('fa-minus-square-o');
+      $('[data-disableable]').prop('disabled', false);
+    }
+
+    var unreadMessageCount = $('[data-message-id].unread').length;
+
+    $unreadMessageCountContainer.html(
+      TEMPLATES.unreadMessageCount
+        .replace('{messageCount}', unreadMessageCount)
+        .replace('{description}', 'unread ' + (unreadMessageCount === 1 ? 'message' : 'messages'))
+    );
   });
 
   // ---- User can select all messages
@@ -107,6 +145,22 @@ $(function () {
     } else {
       $star.removeClass('fa-star').addClass('fa-star-o');
     }
+    return false;
+  });
+
+  // ---- User mark messages as read
+  $('[data-behavior=mark-as-read]').on('click', function () {
+    $('[data-message-id].selected')
+      .addClass('read')
+      .removeClass('unread');
+
+    var unreadMessageCount = $('[data-message-id].unread').length;
+
+    $unreadMessageCountContainer.html(
+      TEMPLATES.unreadMessageCount
+        .replace('{messageCount}', unreadMessageCount)
+        .replace('{description}', 'unread ' + (unreadMessageCount === 1 ? 'message' : 'messages'))
+    );
     return false;
   });
 
