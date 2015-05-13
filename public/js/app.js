@@ -192,33 +192,50 @@ $(function () {
 
   // ---- User mark messages as read
   $('[data-behavior=mark-as-read]').on('click', function () {
-    $('[data-message-id].selected')
-      .addClass('read')
-      .removeClass('unread');
+    var $selectedMessages = $('[data-message-id].selected');
 
-    var unreadMessageCount = $('[data-message-id].unread').length;
+    $.ajax({
+      url: '/api/messages',
+      method: 'POST',
+      data: {
+        read: true,
+        ids: $selectedMessages.map(function(){ return $(this).data('message-id'); }).get()
+      }
+    }).then(function () {
+      $selectedMessages.addClass('read').removeClass('unread');
+      var unreadMessageCount = $('[data-message-id].unread').length;
 
-    $unreadMessageCountContainer.html(
-      TEMPLATES.unreadMessageCount
-        .replace('{messageCount}', unreadMessageCount)
-        .replace('{description}', 'unread ' + (unreadMessageCount === 1 ? 'message' : 'messages'))
-    );
+      $unreadMessageCountContainer.html(
+        TEMPLATES.unreadMessageCount
+          .replace('{messageCount}', unreadMessageCount)
+          .replace('{description}', 'unread ' + (unreadMessageCount === 1 ? 'message' : 'messages'))
+      );
+    });
+
     return false;
   });
 
   // ---- User mark messages as unread
   $('[data-behavior=mark-as-unread]').on('click', function () {
-    $('[data-message-id].selected')
-      .addClass('unread')
-      .removeClass('read');
+    var $selectedMessages = $('[data-message-id].selected');
 
-    var unreadMessageCount = $('[data-message-id].unread').length;
+    $.ajax({
+      url: '/api/messages',
+      method: 'POST',
+      data: {
+        read: false,
+        ids: $selectedMessages.map(function(){ return $(this).data('message-id'); }).get()
+      }
+    }).then(function () {
+      $selectedMessages.addClass('unread').removeClass('read');
+      var unreadMessageCount = $('[data-message-id].unread').length;
 
-    $unreadMessageCountContainer.html(
-      TEMPLATES.unreadMessageCount
-        .replace('{messageCount}', unreadMessageCount)
-        .replace('{description}', 'unread ' + (unreadMessageCount === 1 ? 'message' : 'messages'))
-    );
+      $unreadMessageCountContainer.html(
+        TEMPLATES.unreadMessageCount
+          .replace('{messageCount}', unreadMessageCount)
+          .replace('{description}', 'unread ' + (unreadMessageCount === 1 ? 'message' : 'messages'))
+      );
+    });
     return false;
   });
 

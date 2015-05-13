@@ -31,6 +31,15 @@ router.delete('/api/messages', function(req, res, next) {
   });
 });
 
+router.post('/api/messages', function(req, res, next) {
+  var newAttributes = {};
+  if (req.body.read) newAttributes.read = req.body.read;
+  Message.update({_id: { $in: [].concat(req.body['ids[]']) }}, newAttributes, { multi: true }, function (err, response) {
+    if (err) throw err;
+    res.json(response);
+  });
+});
+
 router.get('/favicon.ico', function(req, res, next) {
   res.end();
 });
