@@ -302,20 +302,31 @@ $(function () {
       value = $(this).val();
     }
     if (value !== '') {
-      $('[data-message-id].selected').each(function () {
-        var $el = $(this).find('[data-container=info]');
-        var labels = $el.find("[data-label]").map(function () {
-          return this.innerHTML;
-        }).get();
-        if (labels.indexOf(value) === -1) {
-          $el.find('[data-label]').remove();
-          labels.push(value);
-          labels.sort();
-          labels.reverse()
-          labels.forEach(function (label) {
-            $el.prepend('<span data-label class="label label-warning">' + label + '</span>');
-          });
+      var $selectedMessages = $('[data-message-id].selected');
+
+      $.ajax({
+        url: '/api/messages/labels/add',
+        method: 'POST',
+        data: {
+          label: value,
+          ids: $selectedMessages.map(function(){ return $(this).data('message-id'); }).get()
         }
+      }).then(function () {
+        $selectedMessages.each(function () {
+          var $el = $(this).find('[data-container=info]');
+          var labels = $el.find("[data-label]").map(function () {
+            return this.innerHTML;
+          }).get();
+          if (labels.indexOf(value) === -1) {
+            $el.find('[data-label]').remove();
+            labels.push(value);
+            labels.sort();
+            labels.reverse()
+            labels.forEach(function (label) {
+              $el.prepend('<span data-label class="label label-warning">' + label + '</span>');
+            });
+          }
+        });
       });
     }
     this.selectedIndex = 0;
@@ -324,16 +335,27 @@ $(function () {
   // ---- User removes labels from a message
   $('[data-behavior=remove-label]').on('change', function () {
     var value = $(this).val();
+    var $selectedMessages = $('[data-message-id].selected');
 
-    $('[data-message-id].selected').each(function () {
-      var $el = $(this).find('[data-container=info]');
-      $el.find("[data-label]").each(function () {
-        if (this.innerHTML === value) {
-          $(this).remove();
-        }
+    $.ajax({
+      url: '/api/messages/labels/remove',
+      method: 'POST',
+      context: this,
+      data: {
+        label: value,
+        ids: $selectedMessages.map(function(){ return $(this).data('message-id'); }).get()
+      }
+    }).then(function () {
+      $selectedMessages.each(function () {
+        var $el = $(this).find('[data-container=info]');
+        $el.find("[data-label]").each(function () {
+          if (this.innerHTML === value) {
+            $(this).remove();
+          }
+        });
       });
+      this.selectedIndex = 0;
     });
-    this.selectedIndex = 0;
   });
 
 });

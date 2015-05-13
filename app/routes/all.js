@@ -40,6 +40,28 @@ router.post('/api/messages', function(req, res, next) {
   });
 });
 
+router.post('/api/messages/labels/add', function(req, res, next) {
+  var query = {_id: { $in: [].concat(req.body['ids[]']) }},
+      updates = { $addToSet: {labels: req.body.label} },
+      options = { multi: true };
+
+  Message.update(query, updates, options, function (err, response) {
+    if (err) throw err;
+    res.json(response);
+  });
+});
+
+router.post('/api/messages/labels/remove', function(req, res, next) {
+  var query = {_id: { $in: [].concat(req.body['ids[]']) }},
+      updates = { $pull: {labels: req.body.label} },
+      options = { multi: true };
+
+  Message.update(query, updates, options, function (err, response) {
+    if (err) throw err;
+    res.json(response);
+  });
+});
+
 router.get('/favicon.ico', function(req, res, next) {
   res.end();
 });
