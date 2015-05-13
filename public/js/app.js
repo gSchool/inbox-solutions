@@ -176,11 +176,16 @@ $(function () {
   // ---- User can unstar a message
   $('[data-container=messages]').on('click', '[data-star]', function () {
     var $star = $(this);
+    var messageId = $star.closest('[data-message-id]').data('message-id');
 
     if ($star.hasClass('fa-star-o')) {
-      $star.removeClass('fa-star-o').addClass('fa-star');
+      $.post('/api/messages/' + messageId, {starred: true}).then(function () {
+        $star.removeClass('fa-star-o').addClass('fa-star');
+      });
     } else {
-      $star.removeClass('fa-star').addClass('fa-star-o');
+      $.post('/api/messages/' + messageId, {starred: false}).then(function () {
+        $star.removeClass('fa-star').addClass('fa-star-o');
+      });
     }
     return false;
   });
