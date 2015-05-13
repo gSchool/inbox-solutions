@@ -97,4 +97,17 @@ $(function () {
     }
   });
 
+  // ---- User can star a message
+  // ---- User can unstar a message
+  $('[data-container=messages]').on('click', '[data-star]', function () {
+    var $star = $(this);
+
+    if ($star.hasClass('fa-star-o')) {
+      $star.removeClass('fa-star-o').addClass('fa-star');
+    } else {
+      $star.removeClass('fa-star').addClass('fa-star-o');
+    }
+    return false;
+  });
+
 });
