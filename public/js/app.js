@@ -29,10 +29,10 @@ $(function () {
   var $messagesContainer = $("[data-container=messages]");
   var $unreadMessageCountContainer = $("[data-container=unread-message-count]");
 
-  $.getJSON('/api/messages').then(function (data) {
+  $.getJSON('/api/messages').then(function (messages) {
     var selectedMessageCount = 0;
-    data.messages.forEach(function (message) {
-      var checked = sessionStorage.getItem('message-' + message.id);
+    messages.forEach(function (message) {
+      var checked = sessionStorage.getItem('message-' + message._id);
       if (checked) selectedMessageCount++;
 
       var labels = message.labels.sort().map(function (label) {
@@ -47,7 +47,7 @@ $(function () {
           .replace('{selectedClass}', checked ? 'selected' : '')
           .replace('{subject}', message.subject)
           .replace('{labels}', labels)
-          .replace('{messageId}', message.id)
+          .replace('{messageId}', message._id)
       )
     });
 

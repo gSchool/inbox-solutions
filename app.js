@@ -1,11 +1,30 @@
 var express = require('express');
 var path = require('path');
-var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+var dotenv = require('dotenv').load();
+var fs = require('fs');
 
-var routes = require('./routes/all');
+var connect = function () {
+  mongoose.connect(process.env.MONGO_URL, {
+    server: {
+      socketOptions: {
+        keepAlive: 1 }
+      }
+    }
+  );
+};
+connect();
+mongoose.connection.on('error', console.log);
+mongoose.connection.on('disconnected', connect);
+
+fs.readdirSync(__dirname + '/app/models').forEach(function (model) {
+  require(__dirname + '/app/models/' + model);
+});
+
+var routes = require('./app/routes/all');
 
 var app = express();
 
