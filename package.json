@@ -1,0 +1,14 @@
+{
+  "name": "inbox-solutions",
+  "version": "1.0.0",
+  "description": "Solutions to http://howto.galvanize.com/tutorials/2015-05-07-javascript-inbox/",
+  "main": "index.html",
+  "scripts": {
+    "start": "http-server"
+  },
+  "author": "Jeff Dean, Galvanize Inc.",
+  "license": "CC BY-NC 3.0 US",
+  "devDependencies": {
+    "http-server": "^0.8.0"
+  }
+}
