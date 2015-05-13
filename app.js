@@ -6,6 +6,7 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var dotenv = require('dotenv').load();
 var fs = require('fs');
+var io = require('socket.io')();
 
 var connect = function () {
   mongoose.connect(process.env.MONGO_URL, {
@@ -24,9 +25,10 @@ fs.readdirSync(__dirname + '/app/models').forEach(function (model) {
   require(__dirname + '/app/models/' + model);
 });
 
-var routes = require('./app/routes/all');
+var routes = require('./app/routes/all')(io);
 
 var app = express();
+app.io = io;
 
 app.use(logger('dev'));
 app.use(bodyParser.json());

@@ -19,6 +19,11 @@ commonly agreed-upon best practices for modern JavaScript code.
 
 $(function () {
 
+  var socket = io.connect('http://localhost:3000');
+  socket.on('message:updated', function (data) {
+    console.log(data);
+  });
+
   // ---- INITIAL PAGE LOAD
   // ---- Loads selection state from sessionStorage
   var TEMPLATES = {
