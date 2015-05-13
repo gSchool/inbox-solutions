@@ -48,4 +48,32 @@ $(function () {
     }
   });
 
+  // ---- User can select an individual message
+  // ---- User can deselect an individual message
+  $('[data-container=messages]').on('change', ':checkbox', function () {
+    $(this).closest('[data-message]').toggleClass('selected');
+    var $checkboxes = $messagesContainer.find(':checkbox');
+    var $multiselect = $('[data-behavior=multiselect]');
+
+    if ($checkboxes.filter(':checked').length === $checkboxes.length) {
+      $multiselect.find('i')
+        .removeClass('fa-square-o')
+        .removeClass('fa-minus-square-o')
+        .addClass('fa-check-square-o');
+      $('[data-disableable]').prop('disabled', false);
+    } else if ($checkboxes.filter(':checked').length === 0) {
+      $multiselect.find('i')
+        .removeClass('fa-check-square-o')
+        .removeClass('fa-minus-square-o')
+        .addClass('fa-square-o');
+      $('[data-disableable]').prop('disabled', true);
+    } else {
+      $multiselect.find('i')
+        .removeClass('fa-square-o')
+        .removeClass('fa-check-square-o')
+        .addClass('fa-minus-square-o');
+      $('[data-disableable]').prop('disabled', false);
+    }
+  });
+
 });
