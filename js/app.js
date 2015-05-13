@@ -229,4 +229,19 @@ $(function () {
     this.selectedIndex = 0;
   });
 
+  // ---- User removes labels from a message
+  $('[data-behavior=remove-label]').on('change', function () {
+    var value = $(this).val();
+
+    $('[data-message-id].selected').each(function () {
+      var $el = $(this).find('[data-container=info]');
+      $el.find("[data-label]").each(function () {
+        if (this.innerHTML === value) {
+          $(this).remove();
+        }
+      });
+    });
+    this.selectedIndex = 0;
+  });
+
 });
