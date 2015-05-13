@@ -164,4 +164,20 @@ $(function () {
     return false;
   });
 
+  // ---- User mark messages as unread
+  $('[data-behavior=mark-as-unread]').on('click', function () {
+    $('[data-message-id].selected')
+      .addClass('unread')
+      .removeClass('read');
+
+    var unreadMessageCount = $('[data-message-id].unread').length;
+
+    $unreadMessageCountContainer.html(
+      TEMPLATES.unreadMessageCount
+        .replace('{messageCount}', unreadMessageCount)
+        .replace('{description}', 'unread ' + (unreadMessageCount === 1 ? 'message' : 'messages'))
+    );
+    return false;
+  });
+
 });
