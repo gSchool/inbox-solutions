@@ -180,4 +180,25 @@ $(function () {
     return false;
   });
 
+  // ---- User deletes messages
+  $('[data-behavior=delete-message]').on('click', function () {
+    $('[data-message-id].selected').remove();
+    var unreadMessageCount = $('[data-message-id].unread').length;
+    var $multiselect = $('[data-behavior=multiselect]');
+
+    $unreadMessageCountContainer.html(
+      TEMPLATES.unreadMessageCount
+        .replace('{messageCount}', unreadMessageCount)
+        .replace('{description}', 'unread ' + (unreadMessageCount === 1 ? 'message' : 'messages'))
+    );
+
+    $multiselect.find('i')
+      .removeClass('fa-check-square-o')
+      .removeClass('fa-minus-square-o')
+      .addClass('fa-square-o');
+    $('[data-disableable]').prop('disabled', true);
+
+    return false;
+  });
+
 });
