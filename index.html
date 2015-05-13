@@ -47,15 +47,15 @@
               Mark As Unread
             </button>
 
-            <select class="form-control label-select" disabled data-disableable>
-              <option>Apply label</option>
+            <select class="form-control label-select" data-behavior="apply-label" disabled data-disableable>
+              <option value="">Apply label</option>
               <option value="dev">dev</option>
               <option value="personal">personal</option>
               <option value="gschool">gschool</option>
             </select>
 
             <select class="form-control label-select" disabled data-disableable>
-              <option>Remove label</option>
+              <option value="">Remove label</option>
               <option value="dev">dev</option>
               <option value="personal">personal</option>
               <option value="gschool">gschool</option>
@@ -85,8 +85,8 @@
             </div>
           </div>
         </div>
-        <div class="col-md-11">
-          {subject}
+        <div class="col-md-11" data-container="info">
+          {labels}{subject}
         </div>
       </div>
     </script>

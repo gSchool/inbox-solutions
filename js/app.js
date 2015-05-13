@@ -15,6 +15,11 @@ $(function () {
     data.messages.forEach(function (message) {
       var checked = sessionStorage.getItem('message-' + message.id);
       if (checked) selectedMessageCount++;
+
+      var labels = message.labels.sort().map(function (label) {
+        return '<span data-label class="label label-warning">' + label + '</span>';
+      }).join('');
+
       $messagesContainer.append(
         TEMPLATES.message
           .replace('{readClass}', message.read ? 'read' : 'unread')
@@ -22,6 +27,7 @@ $(function () {
           .replace('{starClass}', message.starred ? 'fa-star' : 'fa-star-o')
           .replace('{selectedClass}', checked ? 'selected' : '')
           .replace('{subject}', message.subject)
+          .replace('{labels}', labels)
           .replace('{messageId}', message.id)
       )
     });
@@ -199,6 +205,28 @@ $(function () {
     $('[data-disableable]').prop('disabled', true);
 
     return false;
+  });
+
+  // ---- User applies a label to messages
+  $('[data-behavior=apply-label]').on('change', function () {
+    var value = $(this).val();
+
+    $('[data-message-id].selected').each(function () {
+      var $el = $(this).find('[data-container=info]');
+      var labels = $el.find("[data-label]").map(function () {
+        return this.innerHTML;
+      }).get();
+      if (labels.indexOf(value) === -1) {
+        $el.find('[data-label]').remove();
+        labels.push(value);
+        labels.sort();
+        labels.reverse()
+        labels.forEach(function (label) {
+          $el.prepend('<span data-label class="label label-warning">' + label + '</span>');
+        });
+      }
+    });
+    this.selectedIndex = 0;
   });
 
 });
