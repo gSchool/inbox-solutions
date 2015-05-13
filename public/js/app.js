@@ -29,7 +29,7 @@ $(function () {
   var $messagesContainer = $("[data-container=messages]");
   var $unreadMessageCountContainer = $("[data-container=unread-message-count]");
 
-  $.getJSON('/api/inbox.json').then(function (data) {
+  $.getJSON('/api/messages').then(function (data) {
     var selectedMessageCount = 0;
     data.messages.forEach(function (message) {
       var checked = sessionStorage.getItem('message-' + message.id);

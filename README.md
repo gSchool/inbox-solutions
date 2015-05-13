@@ -9,6 +9,7 @@ http://howto.galvanize.com/tutorials/2015-05-07-javascript-inbox/
 Ensure you have node installed, then run:
 
 ```
+npm install -g nodemon
 npm install
 npm start
 ```
