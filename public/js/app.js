@@ -29,70 +29,96 @@ $(function () {
   var $messagesContainer = $("[data-container=messages]");
   var $unreadMessageCountContainer = $("[data-container=unread-message-count]");
 
-  $.getJSON('/api/messages').then(function (messages) {
-    var selectedMessageCount = 0;
-    var allLabels = [];
-    messages.forEach(function (message) {
-      message.labels.forEach(function (label) {
-        if(allLabels.indexOf(label) === -1) allLabels.push(label);
+  window.render = function () {
+    var messageIds = $messagesContainer.find('[data-message-id]').map(function (el) {
+      return $(this).data('message-id');
+    }).get();
+    $.getJSON('/api/messages').then(function (messages) {
+      var newMessageIds = messages.map(function (message) {
+        return message._id;
       });
-      var checked = sessionStorage.getItem('message-' + message._id);
-      if (checked) selectedMessageCount++;
 
-      var labels = message.labels.sort().map(function (label) {
-        return '<span data-label class="label label-warning">' + label + '</span>';
-      }).join('');
+      messageIds.forEach(function (id) {
+        if(newMessageIds.indexOf(id) === -1) {
+          $('[data-message-id=' + id + ']').remove();
+        }
+      });
 
-      $messagesContainer.append(
-        TEMPLATES.message
+      var selectedMessageCount = 0;
+      var allLabels = [];
+      messages.forEach(function (message) {
+        message.labels.forEach(function (label) {
+          if(allLabels.indexOf(label) === -1) allLabels.push(label);
+        });
+        var checked = sessionStorage.getItem('message-' + message._id);
+        if (checked) selectedMessageCount++;
+
+        var labels = message.labels.sort().map(function (label) {
+          return '<span data-label class="label label-warning">' + label + '</span>';
+        }).join('');
+
+        var html = TEMPLATES.message
           .replace('{readClass}', message.read ? 'read' : 'unread')
           .replace('{checked}', checked ? 'checked' : '')
           .replace('{starClass}', message.starred ? 'fa-star' : 'fa-star-o')
           .replace('{selectedClass}', checked ? 'selected' : '')
           .replace('{subject}', message.subject)
           .replace('{labels}', labels)
-          .replace('{messageId}', message._id)
-      )
+          .replace('{messageId}', message._id);
+
+        if (messageIds.indexOf(message._id) > -1) {
+          $('[data-message-id=' + message._id + ']').replaceWith(html);
+        } else {
+          $messagesContainer.append(html);
+        }
+      });
+
+      var $multiselect = $('[data-behavior=multiselect]');
+
+      allLabels.sort().reverse();
+      $('[data-behavior=apply-label] option, [data-behavior=remove-label] option').each(function () {
+        if (this.value) $(this).remove();
+      });
+
+      allLabels.forEach(function (label) {
+        $('[data-behavior=apply-label] option:first')
+          .after('<option value="' + label + '">' + label + '</option>');
+        $('[data-behavior=remove-label] option:first')
+          .after('<option value="' + label + '">' + label + '</option>');
+      });
+
+      if(selectedMessageCount === 0) {
+        $multiselect.find('i')
+          .removeClass('fa-check-square-o')
+          .removeClass('fa-minus-square-o')
+          .addClass('fa-square-o');
+        $('[data-disableable]').prop('disabled', true);
+      } else if (selectedMessageCount === messages.length) {
+        $multiselect.find('i')
+          .removeClass('fa-square-o')
+          .removeClass('fa-minus-square-o')
+          .addClass('fa-check-square-o');
+        $('[data-disableable]').prop('disabled', false);
+      } else {
+        $multiselect.find('i')
+          .removeClass('fa-square-o')
+          .removeClass('fa-check-square-o')
+          .addClass('fa-minus-square-o');
+        $('[data-disableable]').prop('disabled', false);
+      }
+
+      var unreadMessageCount = $('[data-message-id].unread').length;
+
+      $unreadMessageCountContainer.html(
+        TEMPLATES.unreadMessageCount
+          .replace('{messageCount}', unreadMessageCount)
+          .replace('{description}', 'unread ' + (unreadMessageCount === 1 ? 'message' : 'messages'))
+      );
     });
+  };
 
-    var $multiselect = $('[data-behavior=multiselect]');
-
-    allLabels.sort().reverse();
-    allLabels.forEach(function (label) {
-      $('[data-behavior=apply-label] option:first')
-        .after('<option value="' + label + '">' + label + '</option>');
-      $('[data-behavior=remove-label] option:first')
-        .after('<option value="' + label + '">' + label + '</option>');
-    });
-
-    if(selectedMessageCount === 0) {
-      $multiselect.find('i')
-        .removeClass('fa-check-square-o')
-        .removeClass('fa-minus-square-o')
-        .addClass('fa-square-o');
-      $('[data-disableable]').prop('disabled', true);
-    } else if (selectedMessageCount === messages.length) {
-      $multiselect.find('i')
-        .removeClass('fa-square-o')
-        .removeClass('fa-minus-square-o')
-        .addClass('fa-check-square-o');
-      $('[data-disableable]').prop('disabled', false);
-    } else {
-      $multiselect.find('i')
-        .removeClass('fa-square-o')
-        .removeClass('fa-check-square-o')
-        .addClass('fa-minus-square-o');
-      $('[data-disableable]').prop('disabled', false);
-    }
-
-    var unreadMessageCount = $('[data-message-id].unread').length;
-
-    $unreadMessageCountContainer.html(
-      TEMPLATES.unreadMessageCount
-        .replace('{messageCount}', unreadMessageCount)
-        .replace('{description}', 'unread ' + (unreadMessageCount === 1 ? 'message' : 'messages'))
-    );
-  });
+  render();
+  setInterval(render, 3000);
 
   // ---- User can select all messages
   // ---- User can deselect all messages
